@@ -47,7 +47,9 @@ def test_benchmark_offline(classify, test_set_x, batch_size):
 			
 			for batch_num in range(len(out_list)):
 				output_label_batch , pYgivenX = out_list[batch_num]  
-				output_label = output_label_batch[0] + 3 # moving from label to cycle length
+
+				# Removed index in following line
+				output_label = output_label_batch + 3 # moving from label to cycle length
 				pYgivenX[pYgivenX==0] = numpy.float32(1e-30) # hack to output valid entropy
 				# calc entropy
 				curr_entropy = curr_entropy - (pYgivenX*numpy.log(pYgivenX)).sum()

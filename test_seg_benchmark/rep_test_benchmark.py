@@ -94,7 +94,7 @@ def count_movie():
         
     # load weights  
     print 'loading weights'
-    weightFile =  'weights.save'
+    weightFile =  '../live_count/weights.save'
     f = file(weightFile, 'rb')
     loaded_objects = []
     for i in range(5):
