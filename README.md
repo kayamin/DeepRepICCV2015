@@ -1,4 +1,4 @@
-# Live Reptition Counting
+# Live Repetition Counting
 
 Theano implementation by the authors of the original work. Please cite the authors if you are using the code.
 
