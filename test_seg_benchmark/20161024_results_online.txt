@@ -1,8 +1,0 @@
-Using pre-trained 'live_count/weights.save' from:
- https://owncloud.cs.tau.ac.il/index.php/s/q5R5M9oHuoQeK9a
-##########################################################
-
-enropy stride: precentage error:    62.38%
-online entropy counting done
-took 10.92 minutes
-done all
