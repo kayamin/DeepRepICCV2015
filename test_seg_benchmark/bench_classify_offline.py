@@ -27,30 +27,35 @@ def test_benchmark_offline(classify, test_set_x, batch_size):
 	currStride = -1
 	for nStride in (strides):
 		currStride += 1
-		for nTestSet in range(tests_num):   
+
+		for nTestSet in range(tests_num):
+
 			print 'stride: %i, vid: %i' % (nStride, nTestSet)
 			fileName = vid_root+'YT_seg_'+str(nTestSet)+'.avi'
 			mydatasets = load_next_test_data(fileName, nStride)
+
 			ns_test_set_x, valid_ds = mydatasets
 			if (valid_ds == 0):  # file not axists
 				continue
-			test_set_x.set_value(ns_test_set_x, borrow=True)						
+
+			test_set_x.set_value(ns_test_set_x, borrow=True)
 			n_samples = ns_test_set_x.shape[0]
 
-			out_list = [classify(i) for i
-			            in xrange(n_samples)]
+			out_list = [classify(i) for i in xrange(n_samples)]
 
 			frame_counter = 0
 			rep_counter = 0			
 			curr_entropy = 0
 			ent_cnt = 0
-			
+
 			for batch_num in range(len(out_list)):
-				output_label_batch , pYgivenX = out_list[batch_num]  
+
+				output_label_batch , pYgivenX = out_list[batch_num]
 
 				# Removed index in following line
-				output_label = output_label_batch + 3 # moving from label to cycle length
+				output_label = output_label_batch[0] + 3 # moving from label to cycle length
 				pYgivenX[pYgivenX==0] = numpy.float32(1e-30) # hack to output valid entropy
+
 				# calc entropy
 				curr_entropy = curr_entropy - (pYgivenX*numpy.log(pYgivenX)).sum()
 				ent_cnt= ent_cnt + 1

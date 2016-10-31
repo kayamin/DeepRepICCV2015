@@ -16,6 +16,8 @@ class LogisticRegression(object):
 
     def __init__(self, input, n_in, n_out):
 
+        theano.config.on_unused_input = 'ignore'
+
         # initialize with 0 the weights W as a matrix of shape (n_in, n_out)
         self.W = theano.shared(value=numpy.zeros((n_in, n_out),
                                                  dtype=theano.config.floatX),
@@ -52,7 +54,6 @@ class LogisticRegression(object):
         #self.b = b    
 
     def negative_log_likelihood(self, y):
-
         return -T.mean(T.log(self.p_y_given_x)[T.arange(y.shape[0]), y])
 
     def errors(self, y):
@@ -70,7 +71,7 @@ class LogisticRegression(object):
             raise NotImplementedError()
 
     def get_output_labels(self, y):
-        return (((self.y_pred-y)*0 + self.y_pred), self.p_y_given_x)
+        return (self.y_pred, self.p_y_given_x)
 
 
 class HiddenLayer(object):
