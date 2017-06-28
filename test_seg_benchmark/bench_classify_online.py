@@ -189,6 +189,31 @@ def count_entire_movie(classify, test_set_x, data, valid, global_count, curr_res
         return (global_count + st8_count)
 
 
+def load_and_count_video(filename, classify, test_set_x, batch_size):
+
+    # load all 3 stride for this movie
+    (data, valid) = load_movie_data(filename)
+
+    #workaround for short movies
+    if data[0].shape[0] < 81:
+        global_count = count_entire_movie(classify, test_set_x, data, valid, 0, (0,0,0), 0)
+        return global_count
+
+    # get initial counting. all 3 stride for 200 frames.
+    # i.e. st8 runs 25 times. st5 runs 40 times. st2 runs 100 times
+    (global_count, curr_residue) = initial_count(classify, test_set_x, data, valid)
+
+    # get the last multiple of 40 global frame
+    numofiterations = get_inter_num(data,valid)
+    for start_frame in range(200, 200+(40*numofiterations), 40):
+        # from now on sync every 40 frames.
+        # i.e. st8 runs 5 times. st5 8 times and st2 20 times.
+        (global_count, curr_residue) = get_next_count(classify, test_set_x, data, valid, global_count, curr_residue, start_frame)
+
+    # for frames that left get from each
+    global_count = get_remain_count(classify, test_set_x, data, valid, global_count, curr_residue, 200+(40*numofiterations))
+    return global_count
+
 
 def test_benchmark_online(classify, test_set_x, batch_size):
 
@@ -207,31 +232,8 @@ def test_benchmark_online(classify, test_set_x, batch_size):
         fileName = vid_root+"YT_seg_{:02d}.avi".format(nTestSet)
         print(fileName)
 
-        # load all 3 stride for this movie
-        (data, valid) = load_movie_data(fileName)
-
-        #workaround for short movies
-        if (data[0].shape[0]<81):
-            global_count = count_entire_movie(classify, test_set_x, data, valid, 0, (0,0,0), 0)
-            predict[nTestSet] = global_count
-            print("  True Count = {}".format(gt1[nTestSet]))
-            print("  Pred Count = {}".format(predict[nTestSet]))
-            print("#"*60)
-            continue
-
-        # get initial counting. all 3 stride for 200 frames.
-        # i.e. st8 runs 25 times. st5 runs 40 times. st2 runs 100 times
-        (global_count, curr_residue) = initial_count(classify, test_set_x, data, valid)
-
-        # get the last multiple of 40 global frame
-        numofiterations = get_inter_num(data,valid)
-        for start_frame in xrange(200,200+(40*numofiterations),40):
-            # from now on sync every 40 frames.
-            # i.e. st8 runs 5 times. st5 8 times and st2 20 times.
-            (global_count, curr_residue) = get_next_count(classify, test_set_x, data, valid, global_count, curr_residue, start_frame)
-
-        # for frames that left get from each
-        global_count = get_remain_count(classify, test_set_x, data, valid, global_count, curr_residue, 200+(40*numofiterations))
+        # Perform counting
+        global_count = load_and_count_video(fileName, classify, test_set_x, batch_size)
         predict[nTestSet] = global_count
 
         print("  True Count = {}".format(gt1[nTestSet]))
