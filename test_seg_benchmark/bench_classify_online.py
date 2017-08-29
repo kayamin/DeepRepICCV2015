@@ -8,6 +8,7 @@ import numpy
 import cv2
 import pickle
 from common import *
+import cortex.count.experiments
 
 
 def get_inter_num(data, valid):
@@ -23,9 +24,11 @@ def get_inter_num(data, valid):
 
 def load_movie_data(fileName):
 
-    (ns_test_set_x_st2, valid_st2) = load_next_test_data(fileName, 2)
-    (ns_test_set_x_st5, valid_st5) = load_next_test_data(fileName, 5)
-    (ns_test_set_x_st8, valid_st8) = load_next_test_data(fileName, 8)
+    use_full_frame_no_bb = False
+
+    (ns_test_set_x_st2, valid_st2) = load_next_test_data(fileName, 2, use_full_frame_no_bb)
+    (ns_test_set_x_st5, valid_st5) = load_next_test_data(fileName, 5, use_full_frame_no_bb)
+    (ns_test_set_x_st8, valid_st8) = load_next_test_data(fileName, 8, use_full_frame_no_bb)
 
     return ((ns_test_set_x_st2,ns_test_set_x_st5,ns_test_set_x_st8), (valid_st2,valid_st5,valid_st8))
 
@@ -218,7 +221,7 @@ def load_and_count_video(filename, classify, test_set_x, batch_size):
 def test_benchmark_online(classify, test_set_x, batch_size):
 
     strides = (2,5,8)
-    vid_root = '/home/trunia1/data/VideoCountingDatasetClean/LevyWolf_Segment/videos/'
+    vid_root = "/home/trunia1/data/VideoCountingDataset/LevyWolf_Segments/videos/"
     gt_counts = pickle.load( open( "vidGtData.p", "rb" ) )
 
     gt = numpy.tile(gt_counts, (len(strides), 1))
@@ -240,8 +243,9 @@ def test_benchmark_online(classify, test_set_x, batch_size):
         print("  Pred Count = {}".format(predict[nTestSet]))
         print("#"*60)
 
-    import cortex.count.experiments
-    output_dir = "/home/trunia1/data/VideoCountingDatasetClean/LevyWolf_Segment/results/levy_wolf_method/"
+
+    output_dir = "/home/trunia1/experiments/2017/20170826_LevyWolf_Online/LevyWolf_Segments/"
 
     print("#"*60)
+    gt1 = gt1.astype(numpy.int32)
     cortex.count.experiments.write_experiment(predict, gt1, output_dir)

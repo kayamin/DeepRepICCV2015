@@ -19,7 +19,7 @@ def count_entire_quva_dataset(dataset_path):
 
     # Initialize structure for storing results
     cnt_pred = np.zeros(dataset.num_examples, np.float32)
-    cnt_true = np.zeros(dataset.num_examples, np.float32)
+    cnt_true = np.zeros(dataset.num_examples, np.int32)
 
     while dataset.has_next():
         example = dataset.next_example()
@@ -38,5 +38,5 @@ if __name__ == "__main__":
     cnt_true, cnt_pred = count_entire_quva_dataset(quva_dataset)
 
     # Save results
-    results_path = os.path.join(quva_dataset, "results", "LevyWolf")
+    results_path = "/home/trunia1/experiments/2017/20170826_LevyWolf_Online/QUVACount_Segments/no_roi"
     cortex.count.experiments.write_experiment(cnt_pred, cnt_true, results_path)

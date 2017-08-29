@@ -49,7 +49,7 @@ def load_initial_test_data():
 
 
 
-def get_boundingbox(frame_set):
+def get_boundingbox(frame_set, use_full_frame=False):
 
     fstd = numpy.std(frame_set,axis=0)
     framesstd = numpy.mean(fstd)
@@ -59,15 +59,14 @@ def get_boundingbox(frame_set):
     ones = numpy.ones(10)
     big_var = (fstd>th)
 
-    if (framesstd==0): # no bb, take full frame
+    if use_full_frame or framesstd==0:
+        # no bb, take full frame
         frameROIRes = numpy.zeros([20,50,50])
         for i in range(20):
             frameROIRes[i,:,:] = scipy.misc.imresize(frame_set[i,:,:], size=(50,50),interp='bilinear')
-
-        frameROIRes = numpy.reshape(frameROIRes, (1,frameROIRes.shape[0]*frameROIRes.shape[1]*frameROIRes.shape[2]))
+        #frameROIRes = numpy.reshape(frameROIRes, (1,frameROIRes.shape[0]*frameROIRes.shape[1]*frameROIRes.shape[2]))
         frameROIRes = frameROIRes.astype(numpy.float32)
-
-        return (frameROIRes, framesstd)
+        return frameROIRes  #, framesstd)
 
     big_var = big_var.astype(numpy.float32)
     big_var = filters.convolve1d(big_var, ones, axis=0)
@@ -113,7 +112,7 @@ def get_boundingbox(frame_set):
     return (frameROIRes)
 
 
-def load_next_test_data(fileName, stride):
+def load_next_test_data(fileName, stride, use_full_frame_no_bb=False):
 
     # TODO - load the video once and split it into strides.
     #cap = cv2.VideoCapture('Push_ups_active.avi')
@@ -145,7 +144,7 @@ def load_next_test_data(fileName, stride):
             framesList.pop(0)
             # send for bounding box
             framesArr = numpy.array(framesList)
-            frames = get_boundingbox(framesArr)
+            frames = get_boundingbox(framesArr, use_full_frame_no_bb)
             # append sequence
             frames = numpy.reshape(frames, (1,frames.shape[0]*frames.shape[1]*frames.shape[2]))
             frames = frames.astype(numpy.float32)
