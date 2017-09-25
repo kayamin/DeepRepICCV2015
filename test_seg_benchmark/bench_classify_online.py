@@ -8,7 +8,7 @@ import numpy
 import cv2
 import pickle
 from common import *
-import cortex.count.experiments
+import cortex.count
 
 
 def get_inter_num(data, valid):
@@ -244,8 +244,8 @@ def test_benchmark_online(classify, test_set_x, batch_size):
         print("#"*60)
 
 
-    output_dir = "/home/trunia1/experiments/2017/20170826_LevyWolf_Online/LevyWolf_Segments/"
+    output_dir = "/home/trunia1/experiments/2017/20170925_LevyWolf_FINAL/online/LevyWolf_Segments/no_roi/"
 
     print("#"*60)
     gt1 = gt1.astype(numpy.int32)
-    cortex.count.experiments.write_experiment(predict, gt1, output_dir)
+    cortex.count.write_experiment(predict, gt1, output_dir)

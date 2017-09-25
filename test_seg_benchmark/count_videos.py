@@ -7,7 +7,7 @@ from rep_test_benchmark import prepare_network
 from bench_classify_online import load_and_count_video
 
 from count_dataset.quva_count import QUVACountDataset
-import cortex.count.experiments
+import cortex.count
 
 def count_entire_quva_dataset(dataset_path):
 
@@ -38,5 +38,5 @@ if __name__ == "__main__":
     cnt_true, cnt_pred = count_entire_quva_dataset(quva_dataset)
 
     # Save results
-    results_path = "/home/trunia1/experiments/2017/20170826_LevyWolf_Online/QUVACount_Segments/no_roi"
-    cortex.count.experiments.write_experiment(cnt_pred, cnt_true, results_path)
+    results_path = "/home/trunia1/experiments/2017/20170925_LevyWolf_FINAL/online/QUVACount_Segments/full_system"
+    cortex.count.write_experiment(cnt_pred, cnt_true, results_path)
