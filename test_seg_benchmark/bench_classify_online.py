@@ -24,8 +24,6 @@ def get_inter_num(data, valid):
 
 def load_movie_data(fileName, localization_method, segmentation_path=None):
 
-    localization = 'segmentation' # should be: 'full_frame', 'simple' or 'segmentation'
-
     (ns_test_set_x_st2, valid_st2) = load_next_test_data_wrapper(fileName, 2, localization_method, segmentation_path)
     (ns_test_set_x_st5, valid_st5) = load_next_test_data_wrapper(fileName, 5, localization_method, segmentation_path)
     (ns_test_set_x_st8, valid_st8) = load_next_test_data_wrapper(fileName, 8, localization_method, segmentation_path)
@@ -225,8 +223,9 @@ def test_benchmark_online(classify, test_set_x, batch_size):
     seg_root = "/home/trunia1/data/VideoCountingDataset/LevyWolf_Segments/localization/FastVideoSegment"
     gt_counts = pickle.load( open( "vidGtData.p", "rb" ) )
 
-    # This is the place where we set the localization methid
-    localization_method = 'simple'
+    # This is the place where we set the localization method
+    # Should be: 'full_frame', 'simple' or 'segmentation'
+    localization_method = 'segmentation'
 
     gt = numpy.tile(gt_counts, (len(strides), 1))
     gt = gt.T
