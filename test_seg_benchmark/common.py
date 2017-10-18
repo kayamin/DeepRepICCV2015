@@ -11,6 +11,8 @@ from scipy.ndimage import filters
 import scipy
 import cv2
 
+import cortex.vision.fast_seg as fast_seg
+
 
 def shared_dataset(data_xy, borrow=True):
     data_x, data_y = data_xy
@@ -49,7 +51,7 @@ def load_initial_test_data():
 
 
 
-def get_boundingbox(frame_set, use_full_frame=False):
+def get_boundingbox(frame_set, use_region_of_interest=False):
 
     fstd = numpy.std(frame_set,axis=0)
     framesstd = numpy.mean(fstd)
@@ -59,7 +61,7 @@ def get_boundingbox(frame_set, use_full_frame=False):
     ones = numpy.ones(10)
     big_var = (fstd>th)
 
-    if use_full_frame or framesstd==0:
+    if not use_region_of_interest or framesstd==0:
         # no bb, take full frame
         frameROIRes = numpy.zeros([20,50,50])
         for i in range(20):
@@ -112,10 +114,23 @@ def get_boundingbox(frame_set, use_full_frame=False):
     return (frameROIRes)
 
 
-def load_next_test_data(fileName, stride, use_full_frame_no_bb=False):
+def load_next_test_data_wrapper(filename, stride, localization_method, segmentation_path=None):
 
-    # TODO - load the video once and split it into strides.
-    #cap = cv2.VideoCapture('Push_ups_active.avi')
+    assert localization_method in ['full_frame', 'simple', 'segmentation']
+
+    if localization_method == 'full_frame':
+        # Return frame block WITHOUT simple region of interest method
+        return load_next_test_data_simple_roi(filename, stride, False)
+    elif localization_method == 'simple':
+        # Return frame block WITH simple region of interest method
+        return load_next_test_data_simple_roi(filename, stride, True)
+    else:
+        # Return frame blocks WITH more advanced segmentation masks
+        assert segmentation_path is not None, "Need segmentation path..."
+        return load_next_test_data_segmentation(filename, segmentation_path, stride)
+
+def load_next_test_data_simple_roi(fileName, stride, use_region_of_interest=True):
+
     cap = cv2.VideoCapture(fileName)
     frm_cnt = -1
 
@@ -144,7 +159,7 @@ def load_next_test_data(fileName, stride, use_full_frame_no_bb=False):
             framesList.pop(0)
             # send for bounding box
             framesArr = numpy.array(framesList)
-            frames = get_boundingbox(framesArr, use_full_frame_no_bb)
+            frames = get_boundingbox(framesArr, use_region_of_interest)
             # append sequence
             frames = numpy.reshape(frames, (1,frames.shape[0]*frames.shape[1]*frames.shape[2]))
             frames = frames.astype(numpy.float32)
@@ -159,3 +174,73 @@ def load_next_test_data(fileName, stride, use_full_frame_no_bb=False):
     framesData = numpy.squeeze(framesData,axis=1)
     rval = (framesData, 1)
     return rval
+
+
+def load_next_test_data_segmentation(fileName, segmentation_path, stride):
+
+    # Load the video
+    assert os.path.exists(fileName)
+    cap = cv2.VideoCapture()
+    cap.open(fileName)
+    assert cap.isOpened()
+
+    # Load the segmentations
+    seg_masks = fast_seg.load_segmentations(fileName, segmentation_path)
+
+    # Frames in current block and segmentation masks for this block
+    curr_frames = []
+    curr_seg_masks = []
+
+    # List of blocks to pass to the CNN
+    framesData = []
+
+    # First frame in the video has no segmentation (no flow) so we advance one frame
+    cap.read()
+
+    # Current frame index
+    index = 0
+
+    while True:
+
+        ret, frame = cap.read()
+        if ret == 0: break
+
+        if index % stride != 0:
+            continue
+
+        # Convert frame to grayscale
+        frame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+
+        # Push the frame and segmentation mask
+        curr_frames.append(frame)
+        curr_seg_masks.append(seg_masks[index])
+
+        # Block is full, process it
+        if len(curr_frames) > 20:
+
+            curr_frames.pop(0)  # why ??
+
+            # TODO: get the average segmentation mask and use it to crop the frames
+            framesArr = numpy.array(curr_frames)
+            frames = get_boundingbox(framesArr, True)
+
+            # Format the frames to a format for the CNN
+            frames = numpy.reshape(frames, (1,frames.shape[0]*frames.shape[1]*frames.shape[2]))
+            frames = frames.astype(numpy.float32)
+            frames = frames / 255
+
+            framesData.append(frames)
+
+        index += 1
+
+    cap.release()
+
+    # Check if stride is too big for small video
+    if not framesData:
+        return -1,0
+
+    framesData = numpy.array(framesData)
+    framesData = numpy.squeeze(framesData,axis=1)
+
+    # Return blocks of frames and a positive status
+    return framesData, 1
