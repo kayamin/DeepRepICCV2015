@@ -9,7 +9,7 @@ from bench_classify_online import load_and_count_video
 from count_dataset.quva_count import QUVACountDataset
 import cortex.count
 
-def count_quvacount(dataset_path):
+def count_quvacount(dataset):
     '''
 
     Count entire QUVACount dataset using the online method.
@@ -31,7 +31,6 @@ def count_quvacount(dataset_path):
     test_set_x, test_set_y, shared_test_set_y, valid_ds, classify, batchsize = \
         prepare_network()
 
-    dataset = QUVACountDataset(dataset_path)
 
     # Initialize structure for storing results
     cnt_pred = np.zeros(dataset.num_examples, np.float32)
@@ -114,13 +113,15 @@ def count_quvacount_accelerate(dataset_path, vid_accelate_path):
 if __name__ == "__main__":
 
     # Count videos (main experiment)
-    quva_dataset = "/home/trunia1/data/VideoCountingDataset/QUVACount_Segments/"
-    #cnt_true, cnt_pred = count_quvacount(quva_dataset)
+    dataset_path = "/home/trunia1/data/VideoCountingDataset/QUVACount_Segments/"
+    dataset = QUVACountDataset(dataset_path)
+
+    cnt_true, cnt_pred = count_quvacount(dataset)
 
     # Count videos (accelerate subset)
-    accelate_video_path = "/home/trunia1/data/VideoCountingDataset/QUVACount_Segments/videos_acceleration/accelerate_0.5/"
-    cnt_true, cnt_pred = count_quvacount_accelerate(quva_dataset, accelate_video_path)
+    #accelate_video_path = "/home/trunia1/data/VideoCountingDataset/QUVACount_Segments/videos_acceleration/accelerate_0.5/"
+    #cnt_true, cnt_pred = count_quvacount_accelerate(dataset, accelate_video_path)
 
     # Save results
-    results_path = "/home/trunia1/experiments/2017/20170925_LevyWolf_FINAL/online/QUVACount_Segments/full_system_accelerate_0.5"
-    cortex.count.write_experiment(cnt_pred, cnt_true, results_path)
+    results_path = "/home/trunia1/experiments/2017/20170925_LevyWolf_FINAL/online/QUVACount_Segments/full_system"
+    cortex.count.write_experiment(cnt_pred, dataset, results_path)
