@@ -11,6 +11,7 @@ from scipy.ndimage import filters
 import scipy
 import cv2
 
+import cortex.utils
 from cortex.vision.video_reader import VideoReaderOpenCV
 import cortex.vision.fast_seg as fast_seg
 
@@ -187,6 +188,9 @@ def load_next_test_data_segmentation(fileName, segmentation_path, stride):
     seg_masks = fast_seg.load_segmentations(fileName, segmentation_path)
     seg_boxes = fast_seg.segmentations_to_boxes(seg_masks)
 
+    masks_correct = np.loadtxt("/home/trunia1/data/VideoCountingDataset/QUVACount_Segments/localization/fast_video_segment_correct.txt")
+    masks_correct = masks_correct.astype(np.bool)
+
     # Frames in current block and segmentation masks for this block
     curr_frames = []
     curr_boxes  = []
@@ -211,7 +215,24 @@ def load_next_test_data_segmentation(fileName, segmentation_path, stride):
             # Frame is catched by this stride
             # Push the frame and segmentation mask
             curr_frames.append(frame)
-            curr_boxes.append(seg_boxes[index])
+
+            box_to_add = seg_boxes[index]
+            if not fast_seg.box_is_correct(box_to_add):
+                # Take the entire frame if incorrect
+                box_to_add = 0, 0, frame.shape[1], frame.shape[0]
+
+            # Check if the segmentation mask is correct, if not use entire frame
+            if 'LevyWolf' not in fileName:
+                # Dealing with a video from QUVA-Count,
+                # check whether the localization is correct
+                vid_name = cortex.utils.basename(fileName)
+                vid_index = int(vid_name[0:3])
+                if not masks_correct[vid_index]:
+                    if index == 0:
+                        print("segmentation mask NOT correct for video {}: {}".format(vid_index, vid_name))
+                    box_to_add = 0, 0, frame.shape[1], frame.shape[0]
+
+            curr_boxes.append(box_to_add)
 
             #print("index = {}, curr_frames.length = {}, curr_seg_masks.length = {}".format(index, len(curr_frames), len(curr_boxes)))
 
@@ -249,8 +270,12 @@ def load_next_test_data_segmentation(fileName, segmentation_path, stride):
                     frames[i] = scipy.misc.imresize(frames_crop[i,:,:], size=(50,50),interp='bilinear')
 
                 # Format the block for CNN processing
-                frames = np.reshape(frames, (1,frames.shape[0]*frames.shape[1]*frames.shape[2]))
+                frames  = np.reshape(frames, (1,frames.shape[0]*frames.shape[1]*frames.shape[2]))
+                frames /= 255.0
+
                 framesData.append(frames)
+
+                #print(frames, frames.shape)
 
         index += 1
 
