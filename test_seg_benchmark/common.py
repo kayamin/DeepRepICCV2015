@@ -247,7 +247,14 @@ def load_next_test_data_segmentation(fileName, segmentation_path, stride):
                 block_boxes  = np.asarray(curr_boxes)
 
                 # Compute the average bounding box (other options: intersection, union)
-                box = np.mean(block_boxes, axis=0).astype(np.int32)
+                #box = np.mean(block_boxes, axis=0).astype(np.int32)
+
+                # Union of Boxes
+                x1_min = np.min(block_boxes[:,0])
+                y1_min = np.min(block_boxes[:,1])
+                x2_max = np.max(block_boxes[:,2])
+                y2_max = np.max(block_boxes[:,3])
+                box = np.asarray([x1_min, y1_min, x2_max, y2_max])
 
                 # Show the frames + boxes for debugging purpose
                 if debug:
