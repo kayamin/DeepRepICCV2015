@@ -219,13 +219,17 @@ def load_and_count_video(filename, classify, test_set_x, batch_size, localizatio
 def test_benchmark_online(classify, test_set_x, batch_size):
 
     strides = (2,5,8)
-    vid_root = "/home/trunia1/data/VideoCountingDataset/LevyWolf_Segments/videos/"
-    seg_root = "/home/trunia1/data/VideoCountingDataset/LevyWolf_Segments/localization/FastVideoSegment"
+    #vid_root = "/home/trunia1/data/VideoCountingDataset/LevyWolf_Segments/videos/"
+    #seg_root = "/home/trunia1/data/VideoCountingDataset/LevyWolf_Segments/localization/FastVideoSegment"
+
+    vid_root = "/home/trunia1/data/VideoCountingDataset/LevyWolf_Segments_Acceleration_2.0/videos/"
+    seg_root = None
+
     gt_counts = pickle.load( open( "vidGtData.p", "rb" ) )
 
     # This is the place where we set the localization method
     # Should be: 'full_frame', 'simple' or 'segmentation'
-    localization_method = 'segmentation'
+    localization_method = 'simple'
 
     gt = numpy.tile(gt_counts, (len(strides), 1))
     gt = gt.T
@@ -247,7 +251,7 @@ def test_benchmark_online(classify, test_set_x, batch_size):
         print("#"*60)
 
 
-    output_dir = "/home/trunia1/experiments/2017/20170925_LevyWolf_FINAL/online/LevyWolf_Segments/no_roi/"
+    output_dir = "/home/trunia1/experiments/2017/20170925_LevyWolf_FINAL/online/LevyWolf_Acceleration/{}/".format(localization_method)
 
     print("#"*60)
     gt1 = gt1.astype(numpy.int32)
