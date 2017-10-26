@@ -32,7 +32,7 @@ def test_benchmark_offline(classify, test_set_x, batch_size):
 
 			print 'stride: %i, vid: %i' % (nStride, nTestSet)
 			fileName = vid_root+'YT_seg_'+str(nTestSet)+'.avi'
-			mydatasets = load_next_test_data(fileName, nStride)
+			mydatasets = load_next_test_data_simple_roi(fileName, nStride)
 
 			ns_test_set_x, valid_ds = mydatasets
 			if (valid_ds == 0):  # file not axists

@@ -22,13 +22,11 @@ def get_inter_num(data, valid):
         return ((ns_test_set_x_st8.shape[0]-81)/20)
 
 
-def load_movie_data(fileName):
+def load_movie_data(fileName, localization_method, segmentation_path=None):
 
-    use_full_frame_no_bb = False
-
-    (ns_test_set_x_st2, valid_st2) = load_next_test_data(fileName, 2, use_full_frame_no_bb)
-    (ns_test_set_x_st5, valid_st5) = load_next_test_data(fileName, 5, use_full_frame_no_bb)
-    (ns_test_set_x_st8, valid_st8) = load_next_test_data(fileName, 8, use_full_frame_no_bb)
+    (ns_test_set_x_st2, valid_st2) = load_next_test_data_wrapper(fileName, 2, localization_method, segmentation_path)
+    (ns_test_set_x_st5, valid_st5) = load_next_test_data_wrapper(fileName, 5, localization_method, segmentation_path)
+    (ns_test_set_x_st8, valid_st8) = load_next_test_data_wrapper(fileName, 8, localization_method, segmentation_path)
 
     return ((ns_test_set_x_st2,ns_test_set_x_st5,ns_test_set_x_st8), (valid_st2,valid_st5,valid_st8))
 
@@ -192,10 +190,10 @@ def count_entire_movie(classify, test_set_x, data, valid, global_count, curr_res
         return (global_count + st8_count)
 
 
-def load_and_count_video(filename, classify, test_set_x, batch_size):
+def load_and_count_video(filename, classify, test_set_x, batch_size, localization_method, segmentation_path=None):
 
     # load all 3 stride for this movie
-    (data, valid) = load_movie_data(filename)
+    (data, valid) = load_movie_data(filename, localization_method, segmentation_path)
 
     #workaround for short movies
     if data[0].shape[0] < 81:
@@ -222,7 +220,12 @@ def test_benchmark_online(classify, test_set_x, batch_size):
 
     strides = (2,5,8)
     vid_root = "/home/trunia1/data/VideoCountingDataset/LevyWolf_Segments/videos/"
+    seg_root = "/home/trunia1/data/VideoCountingDataset/LevyWolf_Segments/localization/FastVideoSegment"
     gt_counts = pickle.load( open( "vidGtData.p", "rb" ) )
+
+    # This is the place where we set the localization method
+    # Should be: 'full_frame', 'simple' or 'segmentation'
+    localization_method = 'segmentation'
 
     gt = numpy.tile(gt_counts, (len(strides), 1))
     gt = gt.T
@@ -236,7 +239,7 @@ def test_benchmark_online(classify, test_set_x, batch_size):
         print(fileName)
 
         # Perform counting
-        global_count = load_and_count_video(fileName, classify, test_set_x, batch_size)
+        global_count = load_and_count_video(fileName, classify, test_set_x, batch_size, localization_method, seg_root)
         predict[nTestSet] = global_count
 
         print("  True Count = {}".format(gt1[nTestSet]))

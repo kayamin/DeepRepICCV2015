@@ -9,7 +9,7 @@ from bench_classify_online import load_and_count_video
 from count_dataset.quva_count import QUVACountDataset
 import cortex.count
 
-def count_quvacount(dataset):
+def count_quvacount(dataset, localization_method, segmentation_path):
     '''
 
     Count entire QUVACount dataset using the online method.
@@ -38,8 +38,12 @@ def count_quvacount(dataset):
 
     while dataset.has_next():
         example = dataset.next_example()
+
         # Actual counting of the video
-        cnt_pred[example.index] = load_and_count_video(example.video_path, classify, test_set_x, batchsize)
+        cnt_pred[example.index] = load_and_count_video(
+            example.video_path, classify, test_set_x, batchsize,
+            localization_method, segmentation_path)
+
         cnt_true[example.index] = example.rep_count
         print("Video {}. True Count = {}, Predict Count = {}"
               .format(example.name, example.rep_count, cnt_pred[example.index]))
@@ -116,12 +120,16 @@ if __name__ == "__main__":
     dataset_path = "/home/trunia1/data/VideoCountingDataset/QUVACount_Segments/"
     dataset = QUVACountDataset(dataset_path)
 
-    cnt_true, cnt_pred = count_quvacount(dataset)
+    localization_method = 'segmentation'
+    segmentation_path = "/home/trunia1/data/VideoCountingDataset/QUVACount_Segments/localization/FastVideoSegment/"
+
+    # Count the entire dataset
+    cnt_true, cnt_pred = count_quvacount(dataset, localization_method, segmentation_path)
 
     # Count videos (accelerate subset)
     #accelate_video_path = "/home/trunia1/data/VideoCountingDataset/QUVACount_Segments/videos_acceleration/accelerate_0.5/"
     #cnt_true, cnt_pred = count_quvacount_accelerate(dataset, accelate_video_path)
 
     # Save results
-    results_path = "/home/trunia1/experiments/2017/20170925_LevyWolf_FINAL/online/QUVACount_Segments/full_system"
+    results_path = "/home/trunia1/experiments/2017/20170925_LevyWolf_FINAL/online/QUVACount_Segments/fast_seg/"
     cortex.count.write_experiment(cnt_pred, dataset, results_path)
