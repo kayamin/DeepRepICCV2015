@@ -222,7 +222,7 @@ def test_benchmark_online(classify, test_set_x, batch_size):
     #vid_root = "/home/trunia1/data/VideoCountingDataset/LevyWolf_Segments/videos/"
     #seg_root = "/home/trunia1/data/VideoCountingDataset/LevyWolf_Segments/localization/FastVideoSegment"
 
-    vid_root = "/home/trunia1/data/VideoCountingDataset/LevyWolf_Segments_Acceleration_2.0/videos/"
+    vid_root = "/home/trunia1/data/VideoCountingDataset/LevyWolf_Acceleration_2.0/videos/"
     seg_root = None
 
     gt_counts = pickle.load( open( "vidGtData.p", "rb" ) )

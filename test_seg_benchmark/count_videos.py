@@ -6,7 +6,7 @@ import numpy as np
 from rep_test_benchmark import prepare_network
 from bench_classify_online import load_and_count_video
 
-from count_dataset.quva_count import QUVACountDataset
+import count_dataset
 import cortex.count
 
 def count_quvacount(dataset, localization_method, segmentation_path):
@@ -117,11 +117,12 @@ def count_quvacount_accelerate(dataset_path, vid_accelate_path):
 if __name__ == "__main__":
 
     # Count videos (main experiment)
-    dataset_path = "/home/trunia1/data/VideoCountingDataset/QUVACount_Segments/"
-    dataset = QUVACountDataset(dataset_path)
+    dataset = count_dataset.init_quva_dataset(speed=1.0)
 
-    localization_method = 'segmentation'
-    segmentation_path = "/home/trunia1/data/VideoCountingDataset/QUVACount_Segments/localization/FastVideoSegment/"
+    localization_method = 'simple'
+    segmentation_path = None
+
+    #segmentation_path = "/home/trunia1/data/VideoCountingDataset/QUVACount_Segments/localization/FastVideoSegment/"
 
     # Count the entire dataset
     cnt_true, cnt_pred = count_quvacount(dataset, localization_method, segmentation_path)
@@ -131,5 +132,5 @@ if __name__ == "__main__":
     #cnt_true, cnt_pred = count_quvacount_accelerate(dataset, accelate_video_path)
 
     # Save results
-    results_path = "/home/trunia1/experiments/2017/20170925_LevyWolf_FINAL/online/QUVACount_Segments/fast_seg/"
+    results_path = "/home/trunia1/experiments/2017/20170925_LevyWolf_FINAL/online/QUVACount_Acceleration_2.0/{}/".format(localization_method)
     cortex.count.write_experiment(cnt_pred, dataset, results_path)
