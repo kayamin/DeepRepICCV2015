@@ -132,5 +132,5 @@ if __name__ == "__main__":
     #cnt_true, cnt_pred = count_quvacount_accelerate(dataset, accelate_video_path)
 
     # Save results
-    results_path = "/home/trunia1/experiments/2017/20170925_LevyWolf_FINAL/online/QUVACount_Acceleration_2.0/{}/".format(localization_method)
+    results_path = "/home/trunia1/experiments/2017/20170925_LevyWolf_FINAL/online/QUVACount_Segments/{}/".format(localization_method)
     cortex.count.write_experiment(cnt_pred, dataset, results_path)
