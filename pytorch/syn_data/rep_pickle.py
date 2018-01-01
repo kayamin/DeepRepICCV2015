@@ -7,6 +7,7 @@ import gzip
 import os
 import sys
 import numpy as np
+import pandas as pd
 import h5py
 import pdb
 
@@ -40,18 +41,18 @@ trainset_list = []
 for nSet in range(1,601):
 
     # load mat file
-    filename_in = in_dir+'rep_train_data_' + str(nSet) + '.mat'
-    syn_frames, labels = read_matdata(filename_in)
-    pdb.set_trace()
+    # filename_in = in_dir+'rep_train_data_' + str(nSet) + '.mat'
+    # syn_frames, labels = read_matdata(filename_in)
+    # pdb.set_trace()
 
     # store in h5 file
     filename_out = out_dir+'rep_train_data_' + str(nSet) + '.gzip.h5'
     trainset_list.append(filename_out)
-    file = h5py.File(filename_out)
-    file.create_dataset('data_x',data=syn_frames,compression='gzip',compression_opts=9)
-    file.create_dataset('data_y',data=labels,compression='gzip',compression_opts=9)
-    file.close()
-    print("done preparing train set number {}".format(nSet))
+    # file = h5py.File(filename_out)
+    # file.create_dataset('data_x',data=syn_frames,compression='gzip',compression_opts=9)
+    # file.create_dataset('data_y',data=labels,compression='gzip',compression_opts=9)
+    # file.close()
+    # print("done preparing train set number {}".format(nSet))
 
 df = pd.DataFrame()
 df['filename'] = trainset_list
