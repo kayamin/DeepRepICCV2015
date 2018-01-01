@@ -3,7 +3,6 @@ live repetition counting system
 Ofir Levy, Lior Wolf
 Tel Aviv University
 '''
-import cPickle
 import gzip
 import os
 import sys
@@ -14,7 +13,7 @@ from scipy.io import matlab
 import theano
 import theano.tensor as T
 import h5py
-
+import pdb
 
 #---------------------------------------------------------------------------#
 
@@ -46,6 +45,9 @@ def load_rep_dataset(filename):
     data_y = data_y.reshape((data_y.shape[1]))
     data_y = data_y.astype(theano.config.floatX)
     train_set = data_x , data_y
+    
+    pdb.set_trace()
+
     return train_set
 
 
@@ -56,7 +58,7 @@ def load_rep_dataset(filename):
 in_dir = '../out/mat/'
 out_dir = '../out/h5/'
 
-print "starting ..."
+print("starting ...")
 
 # prepare train set
 for nSet in range(1,601):
@@ -72,7 +74,7 @@ for nSet in range(1,601):
     file.create_dataset('data_x',data=data_x,compression='gzip',compression_opts=9)
     file.create_dataset('data_y',data=data_y,compression='gzip',compression_opts=9)  
     file.close()
-    print "done preparing train set number " , nSet
+    print("done preparing train set number {}".format(nSet))
 
 # prepare val set
 for nSet in range(1,101):
@@ -89,6 +91,6 @@ for nSet in range(1,101):
     file.create_dataset('data_y',data=data_y,compression='gzip',compression_opts=9)    
     file.close()
 
-    print "done preparing validation set number " , nSet
+    print("done preparing validation set number {}".format(nSet))
 
-print "done all"
+print("done all")
