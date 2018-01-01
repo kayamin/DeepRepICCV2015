@@ -70,7 +70,6 @@ for nSet in range(1,101):
     filename_out = out_dir+'rep_valid_data_' + str(nSet) + '.gzip.h5'
     validset_list.append(filename_out)
     file = h5py.File(filename_out)
-    data_x , data_y = train_set
     file.create_dataset('data_x',data=syn_frames,compression='gzip',compression_opts=9)
     file.create_dataset('data_y',data=labels,compression='gzip',compression_opts=9)
     file.close()
