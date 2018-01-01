@@ -30,14 +30,14 @@ def read_matdata(filename):
 
 # main:
 
-in_dir = '../out/mat/'
-out_dir = '../out/h5/'
+in_dir = '/mnt/ratmemory_hippocampus/kayama/AIL/out/mat/'
+out_dir = '/mnt/ratmemory_hippocampus/kayama/AIL/out/h5/'
 
 print("starting ...")
 
 # prepare train set
 trainset_list = []
-for nSet in range(1,,601):
+for nSet in range(1,601):
 
     # load mat file
     filename_in = in_dir+'rep_train_data_' + str(nSet) + '.mat'
