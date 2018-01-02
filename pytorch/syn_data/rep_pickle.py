@@ -16,6 +16,11 @@ import pdb
 
 # matファイルからデータを取得
 # cell 形式から読み取るのは若干特殊なので注意
+# mat ファイル一つにつき (50trial x 20frame)x50x50 のデータが存在
+# labels は 50trial 分
+
+# 1trialずつ別のファイルに保存したほうが扱いやすい
+
 def read_matdata(filename):
     with h5py.File(filename, 'r') as f:
         all_cFrames = list(f['all_cFrames'])
@@ -41,18 +46,22 @@ trainset_list = []
 for nSet in range(1,601):
 
     # load mat file
-    # filename_in = in_dir+'rep_train_data_' + str(nSet) + '.mat'
-    # syn_frames, labels = read_matdata(filename_in)
-    # pdb.set_trace()
+    filename_in = in_dir+'rep_train_data_' + str(nSet) + '.mat'
+    syn_frames, labels = read_matdata(filename_in)
+    syn_frames = syn_frames.reshape(-1, 20, 50, 50)
 
     # store in h5 file
-    filename_out = out_dir+'rep_train_data_' + str(nSet) + '.gzip.h5'
-    trainset_list.append(filename_out)
-    # file = h5py.File(filename_out)
-    # file.create_dataset('data_x',data=syn_frames,compression='gzip',compression_opts=9)
-    # file.create_dataset('data_y',data=labels,compression='gzip',compression_opts=9)
-    # file.close()
-    # print("done preparing train set number {}".format(nSet))
+    # 50trial とそのラベルをそれぞれ異なるファイルに保存
+
+    for i in range(len(labels)):
+        file_Idx = 50*(nSet-1) + i
+        filename_out = out_dir+'rep_train_data_' + str(file_Idx) + '.gzip.h5'
+        trainset_list.append(filename_out)
+        file = h5py.File(filename_out)
+        file.create_dataset('data_x',data=syn_frames[i],compression='gzip',compression_opts=9)
+        file.create_dataset('data_y',data=labels[i],compression='gzip',compression_opts=9)
+        file.close()
+        print("done preparing train set number {}".format(file_Idx))
 
 df = pd.DataFrame()
 df['filename'] = trainset_list
@@ -65,16 +74,19 @@ for nSet in range(1,101):
     # load mat file
     filename_in = in_dir+'rep_valid_data_' + str(nSet) + '.mat'
     syn_frames, labels = read_matdata(filename_in)
-
+    syn_frames = syn_frames.reshape(-1, 20, 50, 50)
+    
     # store in h5 file
-    filename_out = out_dir+'rep_valid_data_' + str(nSet) + '.gzip.h5'
-    validset_list.append(filename_out)
-    file = h5py.File(filename_out)
-    file.create_dataset('data_x',data=syn_frames,compression='gzip',compression_opts=9)
-    file.create_dataset('data_y',data=labels,compression='gzip',compression_opts=9)
-    file.close()
+    for i in range(len(labels)):
+        file_Idx = 50*(nSet-1) + i
+        filename_out = out_dir+'rep_valid_data_' + str(file_Idx) + '.gzip.h5'
+        trainset_list.append(filename_out)
+        file = h5py.File(filename_out)
+        file.create_dataset('data_x',data=syn_frames[i],compression='gzip',compression_opts=9)
+        file.create_dataset('data_y',data=labels[i],compression='gzip',compression_opts=9)
+        file.close()
 
-    print("done preparing validation set number {}".format(nSet))
+        print("done preparing train set number {}".format(file_Idx))
 
 df = pd.DataFrame()
 df['filename'] = validset_list
