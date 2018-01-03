@@ -17,7 +17,7 @@ class RepetitionCountingNet(nn.Module):
     def __init__(self):
         super(RepetitionCountingNet, self).__init__()
 
-        # takes input as Batch x Channle x Heigjt x Width form
+        # takes input as Batch x Frames(channel) x Height x Width form
         convLayers = [
 
         nn.Conv2d(20, 40, 5, 1, 1, bias=True),  # Bx20x50x50 -> Bx40x46x46

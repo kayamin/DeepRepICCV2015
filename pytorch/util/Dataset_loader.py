@@ -26,8 +26,6 @@ class Dataset_loader(Dataset):
         data_y = f['data_y'].value
         f.close()
 
-        # H x W x C -> C x H x W
-        data_x = data_x.transpose(2,0,1)
         data_y = data_y.astype('int')
 
         return [data_x, data_y]
