@@ -86,7 +86,7 @@ for nSet in range(1,101):
         file.create_dataset('data_y',data=labels[i],compression='gzip',compression_opts=9)
         file.close()
 
-        print("done preparing train set number {}".format(file_Idx))
+        print("done preparing validation set number {}".format(file_Idx))
 
 df = pd.DataFrame()
 df['filename'] = validset_list
