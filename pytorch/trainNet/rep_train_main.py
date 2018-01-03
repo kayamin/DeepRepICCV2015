@@ -19,6 +19,7 @@ import pdb
 
 from layers import RepetitionCountingNet
 from ...util/Dataset_loader import Dataset_loader
+from ...util/log_learning import log_learning
 
 if __name__=="__main__":
 
@@ -41,7 +42,7 @@ if __name__=="__main__":
     args = parser.parse_args()
 
     # update args and print
-    args.save_dir = os.path.join(args.save_dir, 'TrainResult',datetime.datetime.now().strftime('%Y-%m-%d_%H-%M-%S'))
+    args.savedir = os.path.join(args.savedir,datetime.datetime.now().strftime('%Y-%m-%d_%H-%M-%S'))
 
     os.makedirs(args.save_dir)
 
@@ -49,22 +50,25 @@ if __name__=="__main__":
     for attr, value in sorted(args.__dict__.items()):
         text ="\t{}={}\n".format(attr.upper(), value)
         print(text)
-        with open('{}/Parameters.txt'.format(args.save_dir),'a') as f:
+        with open('{}/Parameters.txt'.format(args.savedir),'a') as f:
             f.write(text)
 
 
     # input data
-    print('n\Loading data from [%s]...' % args.data_place)
+    print('n\Loading data from [%s]...' % args.dataplace)
     trainset_list_path = os.path.join(args.dataplace, 'trainset_list.csv')
+    validset_list_path = os.path.join(args.dataplace, 'validset_list.csv')
     try:
-        filename_df = pd.read_csv(args.dataplace)
+        trainfilename_df = pd.read_csv(trainset_list_path)
+        validfilename_df = pd.read)csv(validset_list_path)
+
     except:
         sprint("Sorry, failed to load data")
 
     # model
-    D = RepetitionCountingNet()
+    D_model = RepetitionCountingNet()
 
-    train_rep(filename_df, D, args)
+    train_rep(D_model, trainfilename_df, validfilename_df, args)
 
     # else:
     #     # pose_code = [] # specify arbitrary pose code for every image
@@ -72,7 +76,7 @@ if __name__=="__main__":
     #     features = Generate_Image(images, pose_code, Nz, G, args)
 
 
-def train_rep(filename_df, D_model, args):
+def train_rep(D_model, trainfilename_df, validfilename_df, args):
 
     rng = np.random.RandomState(23455)
 
@@ -88,20 +92,113 @@ def train_rep(filename_df, D_model, args):
     if args.cuda:
         D_model.cuda()
 
-    D_model.train()
-
     # parameter
-    n_all_train_batches = 30000
-    n_train_batches = train_set_x.get_value(borrow=True).shape[0]
-    n_valid_batches = valid_set_x.get_value(borrow=True).shape[0]
-    n_all_train_batches /= batch_size
-    n_train_batches /= batch_size
-    n_valid_batches /= batch_size
 
+    # データは 50trial ずつ保存され，600ファイル , 30000 trial 存在
+    # 3d のデータセットを 4次元方向 trial 毎にまとめたデータセットを用意する必要がある
+    # 現状は 3d でまとまっているので 分解4d化 →　モデルに投入 が必要
+
+    train_datasize = trainfilename_df.shape[0]
+
+    optimizer_D = optim.SGD(D_model.parameters()m lr = args.lr)
+    losss_criterion = nn.CrossEntropyLoss()
 
     # train model
     print('... training')
+    loss_log = []
+    steps = 0
 
     start_time = time.clock()
 
-    data_set = Dataset_loader(filename_df)
+    for epoch in range(1, args.epochs+1):
+
+        # train model
+
+        D_model.train()
+        data_set = Dataset_loader(trainfilename_df)
+        dataloader = DataLoader(data_set, bath_size = args.batch_size, shuffle=True)
+
+        for i, batch_data in enumerate(dataloader):
+            D_model.zero_grad()
+
+            batch_VideoBlocks = torch.FloatTensor(batch_data[0].float())
+            batch_labels = batch_data[1]
+
+            if args.cuda:
+                batch_VideoBlocks, batch_labels = batch_VideoBlocks.cuda(), batch_labels.cuda()
+
+            batch_VideoBlocks, batch_labels = Variable(batch_VideoBlocks), Variable(batch_labels)
+
+
+            # calcurate prediction and its cross entropy loss
+            count_pred = D_model(batch_VideoBlocks)
+            precision = calc_precision(count_pred, batch_labels)
+            Loss_pred = losss_criterion(count_pred, batch_labels)
+
+
+            # calcurate L1, L2 norm
+            l1_reg = Variable( torch.FloatTensor(1), requires_grad=True)
+            l2_reg = Variable( torch.FloatTensor(1), requires_grad=True)
+            for W in D_model.parameters():
+                l1_reg = l1_reg + W.norm(1)
+                l2_reg = l2_reg + W.norm(2)
+
+
+            # integrate all loss and do backpropagation, update parameters
+            Loss = Loss_pred + args.L1_reg * l1_reg + args.L2_reg * l2reg
+            Loss.backward()
+            optimizer_D.step()
+
+            log_learning(epoch, steps, 'TrainLoss',  Loss_pred.data[0], args, precision)
+
+            steps += 1
+
+
+        # at the end of each epoch run validation
+
+        D_model.eval()
+        data_set = Dataset_loader(validfilename_df)
+        dataloader = DataLoader(data_set, bath_size = args.batch_size, shuffle=True)
+
+        valid_loss = []
+        valid_precision = []
+        for i, batch_data in enumerate(dataloader):
+            batch_VideoBlocks = torch.FloatTensor(batch_data[0].float())
+            batch_labels = batch_data[1]
+
+            if args.cuda:
+                batch_VideoBlocks, batch_labels = batch_VideoBlocks.cuda(), batch_labels.cuda()
+
+            batch_VideoBlocks, batch_labels = Variable(batch_VideoBlocks), Variable(batch_labels)
+
+            # calcurate prediction and its cross entropy loss
+            count_pred = D_model(batch_VideoBlocks)
+            precivion = calc_precision(count_pred, batch_labels)
+            Loss_pred = losss_criterion(count_pred, batch_labels)
+
+            valid_precision.append(precision)
+            valid_loss.append(Loss_pred.data[0])
+
+        valid_precision_mean = np.mean(valid_precision)
+        valid_loss_mean = np.mean(valid_loss)
+
+        log_learning(epoch, steps, 'ValidationLoss', valid_loss_mean, args, valid_precision_mean)
+
+        # save snapshot
+        if epoch%args.savefreq == 0:
+            if not os.path.isdir(args.save_dir): os.makedirs(args.save_dir)
+            save_path_D = os.path.join(args.save_dir,'epoch{}_D.pt'.format(epoch))
+            torch.save(D_model, save_path_D)
+
+
+
+def calc_precision(count_pred, batch_labels):
+
+    _, pred_labels = torch.max(count_pred, 1)
+
+    precision = (pred_labels==batch_labels).type(torch.FloatTensor).sum() / count_pred.size()[0]
+
+    # Variable(FloatTensor) -> Float へと変換
+    precision = precision.data[0]
+
+    return precision

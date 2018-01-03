@@ -8,7 +8,7 @@ from torch.utils.data import DataLoader
 
 class Dataset_loader(Dataset):
 
-    def __init__(self, ename_df, transforms=None):
+    def __init__(self, filename_df, transforms=None):
 
         # Create whole image path list
 
@@ -24,4 +24,7 @@ class Dataset_loader(Dataset):
         data_y = f['data_y'].value
         f.close()
 
-        return [data_x, data_y.astype('int')]
+        data_x = data_x.reshape(-1, 20, 50, 50)
+        data_y = data_y.astype('int')
+
+        return [data_x, data_y]
