@@ -119,12 +119,16 @@ def train_rep(D_model, trainfilename_df, validfilename_df, args):
             D_model.zero_grad()
 
             batch_VideoBlocks = torch.FloatTensor(batch_data[0].float())
-            batch_labels = batch_data[1]
+            batch_labels = torch.LongTensor(batch_data[1])
+            l1_reg = torch.FloatTensor(1)
+            l2_reg = torch.FloatTensor(1)
 
             if args.cuda:
-                batch_VideoBlocks, batch_labels = batch_VideoBlocks.cuda(), batch_labels.cuda()
+                batch_VideoBlocks, batch_labels, l1_reg, l2_reg = \
+                    batch_VideoBlocks.cuda(), batch_labels.cuda(), l1_reg.cuda(), l2_reg.cuda()
 
             batch_VideoBlocks, batch_labels = Variable(batch_VideoBlocks), Variable(batch_labels)
+            l1_reg, l2_reg = Variable(l1_reg, requires_grad=True), Variable(l2_reg, requires_grad=True)
 
 
             # calcurate prediction and its cross entropy loss
@@ -132,10 +136,7 @@ def train_rep(D_model, trainfilename_df, validfilename_df, args):
             precision = calc_precision(count_pred, batch_labels)
             Loss_pred = losss_criterion(count_pred, batch_labels)
 
-
             # calcurate L1, L2 norm
-            l1_reg = Variable( torch.FloatTensor(1), requires_grad=True)
-            l2_reg = Variable( torch.FloatTensor(1), requires_grad=True)
             for W in D_model.parameters():
                 l1_reg = l1_reg + W.norm(1)
                 l2_reg = l2_reg + W.norm(2)
