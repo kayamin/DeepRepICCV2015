@@ -1,6 +1,8 @@
 import os
 import sys
 import numpy as np
+import pickle
+
 import torch
 from torch import nn, optim
 from torch.autograd import Variable
@@ -14,7 +16,7 @@ import pdb
 
 class RepetitionCountingNet(nn.Module):
 
-    def __init__(self):
+    def __init__(self, parameter_path=None):
         super(RepetitionCountingNet, self).__init__()
 
         # takes input as Batch x Frames(channel) x Height x Width form
@@ -42,27 +44,51 @@ class RepetitionCountingNet(nn.Module):
         self.convLayers = nn.Sequential(*convLayers)
         self.fcLayers = nn.Sequential(*fcLayers)
 
-        # 重みの初期化（github実装にならって）
-        for m in self.modules():
-            if isinstance(m, nn.Conv2d):
-                in_ch = m.in_channels
-                out_ch = m.out_channels
-                FH = m.kernel_size[0]
-                FW = m.kernel_size[1]
-                Pooling_Size = 2
+        # 重みの初期化
+        if parameter_path:
+            d = []
+            with open(parameter_path, 'rb') as f :
+                for i in range(5):
+                    d.append(pickle.load(f, encoding='latin1'))
 
-                fan_in = in_ch * FH * FW
-                fan_out = out_ch * FH * FW / Pooling_Size
-                W_bound = np.sqrt(6. / (fan_in + fan_out))
+            cnt = 0;
+            for m in self.modules():
+                if isinstance(m, nn.Conv2d):
+                    weight = np.asarray(d[cnt][0])
+                    bias = np.asarray(d[cnt][0])
+                    m.weight.data = torch.FloatTensor(weight)
+                    m.bias.data = torch.FloatTensor(bias)
+                    cnt = cnt + 1
 
-                nn.init.kaiming_normal(m.weight)
-                # m.weight.data.uniform_(-W_bound, W_bound)
-                # m.bias.data.zero_()
+                if isinstance(m, nn.Linear):
+                    weight = np.asarray(d[cnt][0]).transpose()
+                    bias = np.asarray(d[cnt][1])
+                    m.weight.data = torch.FloatTensor(weight)
+                    m.bias.data = torch.FloatTensor(bias)
+                    cnt = cnt + 1
 
-            elif isinstance(m, nn.Linear):
-                nn.init.kaiming_normal(m.weight)
-                # m.weight.data.zero_()
-                # m.bias.data.zero_()
+        else:
+
+            for m in self.modules():
+                if isinstance(m, nn.Conv2d):
+                    in_ch = m.in_channels
+                    out_ch = m.out_channels
+                    FH = m.kernel_size[0]
+                    FW = m.kernel_size[1]
+                    Pooling_Size = 2
+
+                    fan_in = in_ch * FH * FW
+                    fan_out = out_ch * FH * FW / Pooling_Size
+                    W_bound = np.sqrt(6. / (fan_in + fan_out))
+
+                    nn.init.kaiming_normal(m.weight)
+                    # m.weight.data.uniform_(-W_bound, W_bound)
+                    # m.bias.data.zero_()
+
+                elif isinstance(m, nn.Linear):
+                    nn.init.kaiming_normal(m.weight)
+                    # m.weight.data.zero_()
+                    # m.bias.data.zero_()
 
     def forward(self, input):
 

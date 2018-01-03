@@ -39,7 +39,7 @@ def main():
     parser.add_argument('-dataplace', type=str, default='/mnt/ratmemory_hippocampus/kayama/AIL/out/h5', help='prepared data path to run program')
     # model
     # option
-    parser.add_argument('-snapshot', type=str, default=None, help='filename of model snapshot(snapshot/{Single or Multiple}/{date}/{epoch}) [default: None]')
+    parser.add_argument('-snapshot', type=str, default=None, help='filename of model snapshot [default: None]')
 
     args = parser.parse_args()
 
@@ -68,7 +68,7 @@ def main():
         sprint("Sorry, failed to load data")
 
     # model
-    D_model = RepetitionCountingNet()
+    D_model = RepetitionCountingNet(args.snapshot)
 
     train_rep(D_model, trainfilename_df, validfilename_df, args)
 
