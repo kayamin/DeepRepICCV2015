@@ -53,7 +53,7 @@ class RepetitionCountingNet(nn.Module):
 
             elif isinstance(m, nn.Linear):
                 m.weight.data.zero_()
-                m.bias.data.zero_(）
+                m.bias.data.zero_()
 
     def forward(self, input):
 
