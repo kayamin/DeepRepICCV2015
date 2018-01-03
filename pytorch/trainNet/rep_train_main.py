@@ -101,7 +101,7 @@ def train_rep(D_model, trainfilename_df, validfilename_df, args):
 
     train_datasize = trainfilename_df.shape[0]
 
-    optimizer_D = optim.SGD(D_model.parameters()m lr = args.lr)
+    optimizer_D = optim.SGD(D_model.parameters(), lr = args.lr)
     losss_criterion = nn.CrossEntropyLoss()
 
     # train model
