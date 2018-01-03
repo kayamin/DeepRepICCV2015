@@ -6,8 +6,9 @@ Tel Aviv University
 import numpy
 import theano
 import theano.tensor as T
-from theano.tensor.signal import downsample
+from theano.tensor.signal import pool
 from theano.tensor.nnet import conv
+import pdb
 
 
 class LogisticRegression(object):
@@ -31,13 +32,13 @@ class LogisticRegression(object):
 
         # compute prediction as class whose probability is maximal in
         # symbolic form
-        self.y_pred = T.argmax(self.p_y_given_x, axis=1)  
+        self.y_pred = T.argmax(self.p_y_given_x, axis=1)
        # parameters of the model
         self.params = [self.W, self.b]
 
     def __getstate__(self):
         return (self.W.get_value(), self.b.get_value())
-    
+
     def __setstate__(self, state):
         W, b = state
         self.W.set_value(W)
@@ -89,14 +90,14 @@ class HiddenLayer(object):
 
         lin_output = T.dot(input, self.W) + self.b
         self.output = (lin_output if activation is None
-                       else activation(lin_output))                       
-                       #else T.maximum(0.0, lin_output)) #activation(lin_output))                       
+                       else activation(lin_output))
+                       #else T.maximum(0.0, lin_output)) #activation(lin_output))
         # parameters of the model
         self.params = [self.W, self.b]
 
     def __getstate__(self):
         return (self.W.get_value(), self.b.get_value())
-    
+
     def __setstate__(self, state):
         W, b = state
         self.W.set_value(W)
@@ -139,18 +140,18 @@ class LeNetConvPoolLayer(object):
                 filter_shape=filter_shape, image_shape=image_shape)
 
         # downsample each feature map individually, using maxpooling
-        pooled_out = downsample.max_pool_2d(input=conv_out,
+        pooled_out = pool.pool_2d(input=conv_out,
                                             ds=poolsize, ignore_border=True)
 
         self.output = T.maximum(0.0, pooled_out + self.b.dimshuffle('x', 0, 'x', 'x'))
-                
+
         # store parameters of this layer
         self.params = [self.W, self.b]
 
     def __getstate__(self):
         return (self.W.get_value(), self.b.get_value())
-    
+
     def __setstate__(self, state):
         W, b = state
         self.W.set_value(W)
-        self.b.set_value(b)        
+        self.b.set_value(b)
