@@ -130,6 +130,7 @@ def train_rep(D_model, trainfilename_df, validfilename_df, args):
             # calcurate prediction and its cross entropy loss
             count_pred = D_model(batch_VideoBlocks)
             precision = calc_precision(count_pred, batch_labels)
+            pdb.set_trace()
             Loss_pred = losss_criterion(count_pred, batch_labels)
 
 
@@ -190,7 +191,7 @@ def train_rep(D_model, trainfilename_df, validfilename_df, args):
 
 
 def calc_precision(count_pred, batch_labels):
-    pdb.set_trace()
+
     _, pred_labels = torch.max(count_pred, 1)
 
     precision = (pred_labels==batch_labels).type(torch.FloatTensor).sum() / count_pred.size()[0]
