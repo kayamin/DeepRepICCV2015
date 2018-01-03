@@ -57,6 +57,6 @@ class RepetitionCountingNet(nn.Module):
 
     def forward(self, input):
 
-        x = self.convLayers
+        x = self.convLayers(input)
 
         return x
