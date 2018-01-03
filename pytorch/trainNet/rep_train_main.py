@@ -33,7 +33,7 @@ if __name__=="__main__":
     parser.add_argument('-epochs', type=int, default=200, help='number of epochs for train [default: 200]')
     parser.add_argument('-batchsize', type=int, default=25, help='batch size for training [default: 25]')
     parser.add_argument('-savedir', type=str, default='snapshot', help='where to save the snapshot')
-    parser.add_argument('-savefreq', type=int, default=1, help='save learned model for every "-save-freq" epoch')
+    parser.add_argument('-savefreq', type=int, default=1, help='save learned model for every "-savefreq" epoch')
     parser.add_argument('-cuda', action='store_true', default=False, help='enable the gpu')
     # data souce
     parser.add_argument('-dataplace', type=str, default='/mnt/ratmemory_hippocampus/kayama/AIL/out/h5', help='prepared data path to run program')
@@ -46,7 +46,7 @@ if __name__=="__main__":
     # update args and print
     args.savedir = os.path.join(args.savedir,datetime.datetime.now().strftime('%Y-%m-%d_%H-%M-%S'))
 
-    os.makedirs(args.save_dir)
+    os.makedirs(args.savedir)
 
     print("Parameters:")
     for attr, value in sorted(args.__dict__.items()):
@@ -188,8 +188,8 @@ def train_rep(D_model, trainfilename_df, validfilename_df, args):
 
         # save snapshot
         if epoch%args.savefreq == 0:
-            if not os.path.isdir(args.save_dir): os.makedirs(args.save_dir)
-            save_path_D = os.path.join(args.save_dir,'epoch{}_D.pt'.format(epoch))
+            if not os.path.isdir(args.savedir): os.makedirs(args.savedir)
+            save_path_D = os.path.join(args.savedir,'epoch{}_D.pt'.format(epoch))
             torch.save(D_model, save_path_D)
 
 
