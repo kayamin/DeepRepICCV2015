@@ -56,11 +56,11 @@ class RepetitionCountingNet(nn.Module):
                 W_bound = np.sqrt(6. / (fan_in + fan_out))
 
                 m.weight.data.uniform_(-W_bound, W_bound)
-                m.bias.data.zero_()
+                # m.bias.data.zero_()
 
             elif isinstance(m, nn.Linear):
                 m.weight.data.zero_()
-                m.bias.data.zero_()
+                # m.bias.data.zero_()
 
     def forward(self, input):
 
