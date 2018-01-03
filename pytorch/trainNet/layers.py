@@ -17,16 +17,17 @@ class RepetitionCountingNet(nn.Module):
     def __init__(self):
         super(RepetitionCountingNet, self).__init__()
 
+        # takes input as Batch x Channle x Heigjt x Width form
         convLayers = [
 
-        nn.Conv2d(20, 40, 5, 1, 1, bias=True),  # Bx50x50x20 -> Bx46x46x40
-        nn.MaxPool2d(2),                        # Bx46x46x40 -> Bx23x23x40
+        nn.Conv2d(20, 40, 5, 1, 1, bias=True),  # Bx20x50x50 -> Bx40x46x46
+        nn.MaxPool2d(2),                        # Bx40x46x46 -> Bx40x23x23
         nn.ReLU(),
-        nn.Conv2d(40, 60, 3, 1, 1, bias=True),  # Bx23x23x40 -> Bx21x21x60
-        nn.MaxPool2d(2),                        # Bx21x21x60 -> Bx10x10x60
+        nn.Conv2d(40, 60, 3, 1, 1, bias=True),  # Bx40x23x23 -> Bx60x21x21
+        nn.MaxPool2d(2),                        # Bx60x21x21 -> Bx60x10x10
         nn.ReLU(),
-        nn.Conv2d(60, 90, 3, 1, 1, bias=True),  # Bx10x10x60 -> Bx8x8x90
-        nn.MaxPool2d(2),                        # Bx8x8x90   -> Bx4x4x90
+        nn.Conv2d(60, 90, 3, 1, 1, bias=True),  # Bx60x10x10 -> Bx90x8x8
+        nn.MaxPool2d(2),                        # Bx90x8x8   -> Bx90x4x4
         nn.ReLU(),
 
         ]
