@@ -65,6 +65,7 @@ class RepetitionCountingNet(nn.Module):
     def forward(self, input):
 
         x = self.convLayers(input)
+        pdb.set_trace()
         x = x.view(-1, 4*4*90)
         x = self.fcLayers(x)
 
