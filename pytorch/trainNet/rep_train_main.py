@@ -18,8 +18,8 @@ from torchvision import transforms
 import pdb
 
 from layers import RepetitionCountingNet
-from ...util/Dataset_loader import Dataset_loader
-from ...util/log_learning import log_learning
+from ../util/Dataset_loader import Dataset_loader
+from ../util/log_learning import log_learning
 
 if __name__=="__main__":
 
