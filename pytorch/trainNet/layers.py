@@ -15,7 +15,7 @@ import pdb
 class RepetitionCountingNet(nn.Module):
 
     def __init__(self):
-        super(RepetitionCountigNet, self).__init__()
+        super(RepetitionCountingNet, self).__init__()
 
         convLayers = [
 
