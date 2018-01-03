@@ -23,7 +23,7 @@ from layers import RepetitionCountingNet
 from util.Dataset_loader import Dataset_loader
 from util.log_learning import log_learning
 
-if __name__=="__main__":
+def main():
 
     parser = argparse.ArgumentParser(description='DeepRepICCV2015')
     # learning & saving parameterss
@@ -71,11 +71,6 @@ if __name__=="__main__":
     D_model = RepetitionCountingNet()
 
     train_rep(D_model, trainfilename_df, validfilename_df, args)
-
-    # else:
-    #     # pose_code = [] # specify arbitrary pose code for every image
-    #     pose_code = np.random.uniform(-1,1, (images.shape[0], Np))
-    #     features = Generate_Image(images, pose_code, Nz, G, args)
 
 
 def train_rep(D_model, trainfilename_df, validfilename_df, args):
@@ -204,3 +199,7 @@ def calc_precision(count_pred, batch_labels):
     precision = precision.data[0]
 
     return precision
+
+
+if __name__=="__main__":
+    main()
