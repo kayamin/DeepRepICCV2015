@@ -143,7 +143,7 @@ def train_rep(D_model, trainfilename_df, validfilename_df, args):
 
 
             # integrate all loss and do backpropagation, update parameters
-            Loss = Loss_pred + args.L1_reg * l1_reg + args.L2_reg * l2reg
+            Loss = Loss_pred + args.L1reg * l1_reg + args.L2reg * l2_reg
             Loss.backward()
             optimizer_D.step()
 
