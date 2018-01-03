@@ -113,7 +113,7 @@ def train_rep(D_model, trainfilename_df, validfilename_df, args):
 
         D_model.train()
         data_set = Dataset_loader(trainfilename_df)
-        dataloader = DataLoader(data_set, bath_size = args.batchsize, shuffle=True)
+        dataloader = DataLoader(data_set, batch_size = args.batchsize, shuffle=True)
 
         for i, batch_data in enumerate(dataloader):
             D_model.zero_grad()
@@ -155,7 +155,7 @@ def train_rep(D_model, trainfilename_df, validfilename_df, args):
 
         D_model.eval()
         data_set = Dataset_loader(validfilename_df)
-        dataloader = DataLoader(data_set, bath_size = args.batchsize, shuffle=True)
+        dataloader = DataLoader(data_set, batch_size = args.batchsize, shuffle=True)
 
         valid_loss = []
         valid_precision = []
