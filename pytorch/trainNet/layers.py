@@ -34,8 +34,8 @@ class RepetitionCountingNet(nn.Module):
 
         fcLayers = [
 
-        nn.Linear(4*4*90, 500, bias=False),  # Bx(4*4*90) -> Bx500
-        nn.Linear(500, 8, bias=False)        # Bx500 -> Bx8
+        nn.Linear(4*4*90, 500, bias=True),  # Bx(4*4*90) -> Bx500
+        nn.Linear(500, 8, bias=True)        # Bx500 -> Bx8
 
         ]
 
