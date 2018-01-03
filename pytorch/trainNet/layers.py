@@ -20,13 +20,13 @@ class RepetitionCountingNet(nn.Module):
         # takes input as Batch x Frames(channel) x Height x Width form
         convLayers = [
 
-        nn.Conv2d(20, 40, 5, 1, 1, bias=True),  # Bx20x50x50 -> Bx40x46x46
+        nn.Conv2d(20, 40, 5, 1, bias=True),     # Bx20x50x50 -> Bx40x46x46
         nn.MaxPool2d(2),                        # Bx40x46x46 -> Bx40x23x23
         nn.ReLU(),
-        nn.Conv2d(40, 60, 3, 1, 1, bias=True),  # Bx40x23x23 -> Bx60x21x21
+        nn.Conv2d(40, 60, 3, 1, bias=True),     # Bx40x23x23 -> Bx60x21x21
         nn.MaxPool2d(2),                        # Bx60x21x21 -> Bx60x10x10
         nn.ReLU(),
-        nn.Conv2d(60, 90, 3, 1, 1, bias=True),  # Bx60x10x10 -> Bx90x8x8
+        nn.Conv2d(60, 90, 3, 1, bias=True),     # Bx60x10x10 -> Bx90x8x8
         nn.MaxPool2d(2),                        # Bx90x8x8   -> Bx90x4x4
         nn.ReLU(),
 
