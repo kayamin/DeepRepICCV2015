@@ -61,7 +61,7 @@ if __name__=="__main__":
     validset_list_path = os.path.join(args.dataplace, 'validset_list.csv')
     try:
         trainfilename_df = pd.read_csv(trainset_list_path)
-        validfilename_df = pd.read)csv(validset_list_path)
+        validfilename_df = pd.read_csv(validset_list_path)
 
     except:
         sprint("Sorry, failed to load data")
