@@ -135,6 +135,7 @@ def train_rep(D_model, trainfilename_df, validfilename_df, args):
             count_pred = D_model(batch_VideoBlocks)
             precision = calc_precision(count_pred, batch_labels)
             Loss_pred = losss_criterion(count_pred, batch_labels)
+            pdb.set_trace()
 
             # calcurate L1, L2 norm
             for W in D_model.parameters():
