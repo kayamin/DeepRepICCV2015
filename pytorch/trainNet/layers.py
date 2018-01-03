@@ -19,14 +19,14 @@ class RepetitionCountingNet(nn.Module):
 
         convLayers = [
 
-        nn.conv2d(20, 40, 5, 1, 1, bias=True),  # 50x50x20 -> 46x46x40
-        nn.max_pool_2d(2),                      # 46x46x40 -> 23x23x40
+        nn.Conv2d(20, 40, 5, 1, 1, bias=True),  # 50x50x20 -> 46x46x40
+        nn.MaxPool2d(2),                      # 46x46x40 -> 23x23x40
         nn.ReLU(),
-        nn.conv2d(40, 60, 3, 1, 1, bias=True),  # 23x23x40 -> 21x21x60
-        nn.max_pool_2d(2),                      # 21x21x60 -> 10x10x60
+        nn.Conv2d(40, 60, 3, 1, 1, bias=True),  # 23x23x40 -> 21x21x60
+        nn.MaxPool2d(2),                      # 21x21x60 -> 10x10x60
         nn.ReLU(),
-        nn.conv2d(60, 90, 3, 1, 1, bias=True),  # 10x10x60 -> 8x8x90
-        nn.max_pool_2d(2),                      # 8x8x90 -> 4x4x90
+        nn.Conv2d(60, 90, 3, 1, 1, bias=True),  # 10x10x60 -> 8x8x90
+        nn.MaxPool2d(2),                      # 8x8x90 -> 4x4x90
         nn.ReLU(),
         nn.Linear(4*4*90, 500, bias=True),
         nn.Linear(500, 8, bias=True)
