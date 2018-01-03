@@ -27,5 +27,5 @@ class Dataset_loader(Dataset):
         f.close()
 
         data_y = data_y.astype('int')
-        pdb.set_trace()
+
         return [data_x, data_y]
