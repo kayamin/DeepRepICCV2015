@@ -18,7 +18,7 @@ class Dataset_loader(Dataset):
         return len(self.data_path)
 
     def __getitem__(self, idx):
-        filename = self.whole_image_path[idx]
+        filename = self.data_path[idx]
         f = h5py.File(filename)
         data_x = f['data_x'].value
         data_y = f['data_y'].value
