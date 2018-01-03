@@ -55,11 +55,12 @@ class RepetitionCountingNet(nn.Module):
                 fan_out = out_ch * FH * FW / Pooling_Size
                 W_bound = np.sqrt(6. / (fan_in + fan_out))
 
-                m.weight.data.uniform_(-W_bound, W_bound)
+                nn.init.kaiming_normal(m.weight)
+                # m.weight.data.uniform_(-W_bound, W_bound)
                 # m.bias.data.zero_()
 
             elif isinstance(m, nn.Linear):
-                m.weight.data.normal_(0, 0.02)
+                nn.init.kaiming_normal(m.weight)
                 # m.weight.data.zero_()
                 # m.bias.data.zero_()
 
